@@ -20,12 +20,10 @@ datos_dual$Tratamiento <- factor(datos_dual$Tratamiento,
 head(datos_dual )
 
 datos_dual2 <- datos_dual %>% 
-  select(Tratamiento, U.A.) %>% 
-  mutate(U.A.2=U.A.*1000/50) %>% 
-  select(Tratamiento,U.A.2) %>% 
+  select(Tratamiento, Valores)  %>% 
   group_by(Tratamiento) %>% 
-  filter(U.A.2<500)
-  
+  filter(Valores<1.2)
+
 
 datos_dual2
 
@@ -41,12 +39,12 @@ resumen_dual
 #visualizamos la distribución
 caja1 <- datos_dual2 %>% 
   ggboxplot(x="Tratamiento",
-            y="U.A.2",
+            y="U.A.2.",
             color="Tratamiento",
             palette = "jco")
 caja1
 
-modelo <- lm(U.A.2~Tratamiento, data = datos_dual2)
+modelo <- lm(Valores~Tratamiento, data = datos_dual2)
 ggqqplot(residuals(modelo))
 
 #####################################3
@@ -73,7 +71,7 @@ bartlett.test(U.A.2~Tratamiento, data=datos_dual2)
 
 ###############################33
 
-ANOVA_dual<- aov( U.A.2~Tratamiento,data = datos_dual2) #Ponemos de donde se sacan los datos y luego la relación
+ANOVA_dual<- aov( Valores~Tratamiento,data = datos_dual2) #Ponemos de donde se sacan los datos y luego la relación
 
 #Visualizamos
 ANOVA_dual
@@ -96,11 +94,10 @@ similitud <- c("a","ab","b","b","c") #se construye con los resultados de las int
 resumen_dual
 
 resumen_dual_ANOVA <- resumen_dual %>% 
-  select(Tratamiento, n, mean, sd, se) %>% 
+  select(Tratamiento, n, mean, sd,se) %>% 
   mutate(similitud)
 
 resumen_dual_ANOVA
-
 ################################################################################
 
 
@@ -121,12 +118,12 @@ barras1 <- Grafica_datos %>%
 barras1
 
 miny=0
-maxy=520
+maxy=1.1
 
 
 marcasy <- seq(from=miny,
                to=maxy,
-               by=50)
+               by=0.2)
 
 
 barras2 <- barras1+
@@ -152,12 +149,12 @@ barras2 <- barras1+
                      ymax=mean+se), 
                  width=0.2, colour="black", alpha=1, size=.8)+
   xlab("Treatment")+
-  ylab("Iron concentration (ng)/\nTotal protein(µg)")+
+  ylab("Iron concentration (p.d.u.)")+
   
   
   geom_text(aes(label=similitud),
             nudge_x=0.25,     #REspecto al eje x que tanto cambia
-            nudge_y =50,      #respecto al eje y que tanto cambia
+            nudge_y =0.05,      #respecto al eje y que tanto cambia
             size=6,
             face="bold")+
   scale_fill_simpsons()+
@@ -167,7 +164,7 @@ barras2 <- barras1+
 
 barras2
 
-ggsave(filename = "Tratamiento_dual.png",
+ggsave(filename = "Tratamiento_dual_normalizado.png",
        plot = barras2,
        dpi = 600,
        height = 5,
@@ -183,7 +180,7 @@ barras3 <- barras2+
   scale_fill_grey()
 barras3 
 
-ggsave(filename = "Tratamiento_dualgris.png",
+ggsave(filename = "Tratamiento_dual_normalizadogris.png",
        plot = barras3,
        dpi = 600,
        height = 5,
